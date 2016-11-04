@@ -21,7 +21,7 @@ function exhaustGenerator(generator) {
 /**
  * Retrieves some content asynchronously.
  */
-async function getContent() {
+function getContent() {
   return new Promise(function (resolve, reject) {
     // throw new Error('ErrorMessage');
     resolve('RETRIEVED_CONTENT');
@@ -32,7 +32,7 @@ async function getContent() {
  * Commits the given content and resolves with a message telling what was committed.
  * @param {string} content The content to commit.
  */
-async function commit(content) {
+function commit(content) {
   return new Promise(function (resolve, reject) {
     resolve('committed: ' + content);
   });
