@@ -3,17 +3,23 @@
  * Passes the yielded result back in to the next next call.
  * @param {function*} generator A generator which yields Promises.
  */
-function exhaustGenerator(generator) {
+function asynchronously(generator) {
   var g = generator();
-  (function go (result) {
-    var step = g.next(result);
+  (function go (err, result) {
+    var step;
+    if (err) {
+      step = g.throw(err);  
+    } else {
+      step = g.next(result);
+    }
+    
     if (!step.done) {
       var promise = step.value;
       promise.then(function (resolvedValue) {
-        go([null, resolvedValue]);
+        go(null, resolvedValue);
       }).catch(function (e) {
-        go([e]);
-      });    
+        go(e);
+      })
     }
   })();
 }
@@ -41,12 +47,14 @@ function commit(content) {
 /**
  * A main method to test out asynchronous code looking like synchronous code.
  */
-exhaustGenerator(function* () {
-  var [err, content] = yield getContent();
-  if (err) {
-    content = err.message;
+asynchronously(function* () {
+  var content;
+  try {
+    content = yield getContent();
+  } catch (e) {
+    content = e.message;
   }
   
-  var [err, result] = yield commit(content);
-  console.log(result);    
+  var result = yield commit(content);
+  console.log(result);
 });
